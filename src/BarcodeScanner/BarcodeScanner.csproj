@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wpa81+wp8</PackageTargetFallback>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageId>BarcodeScanning.Service</PackageId>
+    <PackageVersion>1.0.0-pre1</PackageVersion>
+    <Authors>Dan Siegel</Authors>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Owners>Dan Siegel</Owners>
+    <Title>Barcode Scanning</Title>
+    <Description>Provides barcode scanning as a Service using either a ContentPage or PopupPage. Either experience can be further customized by implementing your own version and overriding any of the setter methods. </Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.2.9" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.0-pre2" />
+  </ItemGroup>
+
+</Project>
