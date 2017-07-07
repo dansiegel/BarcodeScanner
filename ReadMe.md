@@ -2,6 +2,8 @@
 
 I have simply found that I'm relying on Barcode Scanning so often that it gets old having needing to implement barcode scanning over and over. This library aims to reduce your effort while developing a new app while providing you a framework that provides for ease in testing.
 
+[![ScannerNuGetShield]][ScannerNuGet]
+
 ## License &amp; Support
 
 Found a bug, or have an idea to make this library better please feel free to create an [issue][issues].
@@ -12,13 +14,14 @@ This library is distributed with an MIT License. You can make any modifications 
 
 ## Getting Started
 
-This library has no direct dependencies on any MVVM Framework or DI container and as such can be used with ease regardless of the Framework or DI Container you use. The sample code is based on Prism with DryIoc.
+This library has no direct dependencies on any MVVM Framework or DI container and as such can be used with ease regardless of the Framework or DI Container you use. The sample code is based on Prism with DryIoc. Note that the `PopupBarcodeScannerService` does have a dependency on the `IPopupNavigation` service. you will need to be sure to register the `PopupNavigation.Instance` with your DI container.
 
 ```cs
 public void RegisterTypes()
 {
     // Uses a Popup Page to contain the Scanner
     Container.Register<IBarcodeScannerService, PopupBarcodeScannerService>();
+    Container.UseInstance<IPopupNavigation>(PopupNavigation.Instance);
 
     // Uses a Content Page to contain the Scanner
     Container.Register<IBarcodeScannerService, ContentPageBarcodeScannerService>();
@@ -161,3 +164,5 @@ public partial class AppDelegate : FormsApplicationDelegate
 [RgPopup]: https://github.com/rotorgames/Rg.Plugins.Popup
 [ZXingNet]: https://github.com/Redth/ZXing.Net.Mobile
 [RgInitialization]: https://github.com/rotorgames/Rg.Plugins.Popup#initialize
+[ScannerNuGetShield]: https://img.shields.io/nuget/vpre/BarcodeScanning.Service.svg
+[ScannerNuGet]: https://www.nuget.org/packages/BarcodeScanning.Service
