@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Rg.Plugins.Popup.Contracts;
 using Rg.Plugins.Popup.Pages;
-using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using ZXing;
 using ZXing.Mobile;
@@ -12,12 +12,16 @@ namespace BarcodeScanner
     {
         protected ZXingScannerView scannerView { get; }
 
+        protected IPopupNavigation PopupNavigation { get; }
+
         private bool HasResult { get; set; }
 
         private Result Result { get; set; }
 
-        public PopupBarcodeScannerService()
+        public PopupBarcodeScannerService(IPopupNavigation popupNavigation)
         {
+            PopupNavigation = popupNavigation;
+
             BackgroundClicked += (sender, e) => HasResult = true;
 
             Padding = GetDefaultPadding();
@@ -91,17 +95,17 @@ namespace BarcodeScanner
 
         public async Task<string> ReadBarcodeAsync()
         {
-            await PopupNavigation.Instance.PushAsync(this);
+            await PopupNavigation.PushAsync(this);
             await Task.Run(() => { while(!HasResult) { } });
-            await PopupNavigation.Instance.RemovePageAsync(this);
+            await PopupNavigation.RemovePageAsync(this);
             return Result?.Text;
         }
 
         public async Task<Result> ReadBarcodeResultAsync()
         {
-            await PopupNavigation.Instance.PushAsync(this);
+            await PopupNavigation.PushAsync(this);
             await Task.Run(() => { while(!HasResult) { } });
-            await PopupNavigation.Instance.RemovePageAsync(this);
+            await PopupNavigation.RemovePageAsync(this);
             return Result;
         }
 
