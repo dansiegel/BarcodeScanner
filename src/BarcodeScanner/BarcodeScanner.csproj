@@ -11,6 +11,10 @@
     <Owners>Dan Siegel</Owners>
     <Title>Barcode Scanning</Title>
     <Description>Provides barcode scanning as a Service using either a ContentPage or PopupPage. Either experience can be further customized by implementing your own version and overriding any of the setter methods. </Description>
+    <PackageLicenseUrl>https://github.com/dansiegel/BarcodeScanner/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dansiegel/BarcodeScanner/</PackageProjectUrl>
+    <Summary>Provides Barcode Scanning as a reusable service for Xamarin Forms projects using ZXing.Net and providing the ability to have the Scanner as a full screen Content Page or as a Popup Page.</Summary>
+    <PackageTags>barcodes scanning zxing popups xamarin.forms</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
