@@ -5,7 +5,7 @@
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wpa81+wp8</PackageTargetFallback>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>BarcodeScanning.Service</PackageId>
-    <PackageVersion>1.0.0-pre1</PackageVersion>
+    <PackageVersion>1.0.0-pre2</PackageVersion>
     <Authors>Dan Siegel</Authors>
     <NeutralLanguage>en</NeutralLanguage>
     <Owners>Dan Siegel</Owners>
@@ -21,8 +21,8 @@
     <DebugType></DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.2.9" />
-    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.0-pre2" />
+    <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.3.2" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.0-pre3" />
   </ItemGroup>
 
 </Project>
