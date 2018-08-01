@@ -1,25 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wpa81+wp8</AssetTargetFallback>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>BarcodeScanning.Service</PackageId>
-    <PackageVersion>1.0.0-pre3</PackageVersion>
-    <Authors>Dan Siegel</Authors>
-    <NeutralLanguage>9</NeutralLanguage>
-    <Owners>Dan Siegel</Owners>
     <Title>Barcode Scanning</Title>
     <Description>Provides barcode scanning as a Service using either a ContentPage or PopupPage. Either experience can be further customized by implementing your own version and overriding any of the setter methods. </Description>
-    <PackageLicenseUrl>https://github.com/dansiegel/BarcodeScanner/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/dansiegel/BarcodeScanner/</PackageProjectUrl>
     <Summary>Provides Barcode Scanning as a reusable service for Xamarin Forms projects using ZXing.Net and providing the ability to have the Scanner as a full screen Content Page or as a Popup Page.</Summary>
-    <PackageTags>barcodes scanning zxing popups xamarin.forms</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.3.2" />
-    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.0-pre8" />
+    <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.4.1" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.4.168" />
   </ItemGroup>
 
 </Project>

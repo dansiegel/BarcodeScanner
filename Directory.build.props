@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project>
+
+  <PropertyGroup>
+    <Product>$(AssemblyName) ($(TargetFramework))</Product>
+    <Authors>Dan Siegel</Authors>
+    <Owners>Dan Siegel</Owners>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
+    <VersionSuffix>ci</VersionSuffix>
+    <VersionSuffix Condition=" '$(IS_PREVIEW)' == 'true' ">pre</VersionSuffix>
+    <VersionSuffix Condition=" '$(IS_RELEASE)' == 'true' "></VersionSuffix>
+    <PackageOutputPath Condition=" '$(BUILD_BUILDNUMBER)' == '' ">$(MSBuildThisFileDirectory)Artifacts</PackageOutputPath>
+    <PackageOutputPath Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_ARTIFACTSTAGINGDIRECTORY)</PackageOutputPath>
+    <NeutralLanguage>en</NeutralLanguage>
+    <IncludeSymbols>True</IncludeSymbols>
+    <IncludeSource>True</IncludeSource>
+    <PackageIconUrl>https://github.com/dansiegel/BarcodeScanner/raw/master/logo/iconv3.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/dansiegel/BarcodeScanner/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dansiegel/BarcodeScanner/</PackageProjectUrl>
+    <PackageTags>barcodes scanning zxing popups xamarin.forms</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+</Project>
