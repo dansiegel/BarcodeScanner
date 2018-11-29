@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.4.1" />
-    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.4.168" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="1.1.5.180" />
   </ItemGroup>
 
 </Project>
