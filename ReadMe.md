@@ -2,6 +2,7 @@
 
 I have simply found that I'm relying on Barcode Scanning so often that it gets old having needing to implement barcode scanning over and over. This library aims to reduce your effort while developing a new app while providing you a framework that provides for ease in testing.
 
+[![Build Status](https://dev.azure.com/dansiegel/Barcode%20Scanner/_apis/build/status/Barcode%20Scanner-CI)](https://dev.azure.com/dansiegel/Barcode%20Scanner/_build/latest?definitionId=37)
 [![ScannerNuGetShield]][ScannerNuGet]
 
 ## License &amp; Support
