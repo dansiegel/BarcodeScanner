@@ -10,7 +10,7 @@ namespace BarcodeScanner
 {
     public class PopupBarcodeScannerService : PopupPage, IBarcodeScannerService
     {
-        protected ZXingScannerView scannerView { get; }
+        protected ZXingScannerView ScannerView { get; }
 
         protected IPopupNavigation PopupNavigation { get; }
 
@@ -26,7 +26,7 @@ namespace BarcodeScanner
 
             Padding = GetDefaultPadding();
 
-            scannerView = new ZXingScannerView
+            ScannerView = new ZXingScannerView
             {
                 AutomationId = "zxingScannerView",
                 HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -34,7 +34,7 @@ namespace BarcodeScanner
                 Options = GetScanningOptions(),
             };
 
-            scannerView.OnScanResult += OnScanResult;
+            ScannerView.OnScanResult += OnScanResult;
 
             var overlay = GetScannerOverlay();
 
@@ -44,7 +44,7 @@ namespace BarcodeScanner
                 HorizontalOptions = LayoutOptions.FillAndExpand,
             };
 
-            grid.Children.Add(scannerView);
+            grid.Children.Add(ScannerView);
 
             if(overlay != null)
             {
@@ -67,13 +67,13 @@ namespace BarcodeScanner
             {
                 TopText = TopText(),
                 BottomText = BottomText(),
-                ShowFlashButton = scannerView.HasTorch,
+                ShowFlashButton = ScannerView.HasTorch,
                 AutomationId = "zxingDefaultOverlay",
             };
 
             overlay.FlashButtonClicked += (sender, e) =>
             {
-                scannerView.IsTorchOn = !scannerView.IsTorchOn;
+                ScannerView.IsTorchOn = !ScannerView.IsTorchOn;
             };
 
             return overlay;
@@ -114,14 +114,14 @@ namespace BarcodeScanner
             base.OnAppearing();
             HasResult = false;
             Result = null;
-            scannerView.IsScanning = true;
+            ScannerView.IsScanning = true;
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
             HasResult = true;
-            scannerView.IsScanning = false;
+            ScannerView.IsScanning = false;
         }
 
         private void OnScanResult(Result result)
