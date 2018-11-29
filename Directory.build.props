@@ -5,7 +5,7 @@
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <Authors>Dan Siegel</Authors>
     <Owners>Dan Siegel</Owners>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <VersionPrefix Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
     <VersionSuffix>ci</VersionSuffix>
     <VersionSuffix Condition=" '$(IS_PREVIEW)' == 'true' ">pre</VersionSuffix>
@@ -18,7 +18,12 @@
     <PackageIconUrl>https://github.com/dansiegel/BarcodeScanner/raw/master/logo/iconv3.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/dansiegel/BarcodeScanner/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/dansiegel/BarcodeScanner/</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/dansiegel/BarcodeScanner.git</RepositoryUrl>
     <PackageTags>barcodes scanning zxing popups xamarin.forms</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
