@@ -6,6 +6,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EEB8E8B-34E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarcodeScanner", "src\BarcodeScanner\BarcodeScanner.csproj", "{7B1B8EBB-BDC2-4824-B951-26C52DB0B885}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F35FEA21-8631-42E8-8AE3-501FC6C5E31E}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.build.props = Directory.build.props
+		LICENSE = LICENSE
+		ReadMe.md = ReadMe.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
