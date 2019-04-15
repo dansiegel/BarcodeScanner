@@ -5,7 +5,7 @@
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <Authors>Dan Siegel</Authors>
     <Owners>Dan Siegel</Owners>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
     <VersionPrefix Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
     <VersionSuffix>ci</VersionSuffix>
     <VersionSuffix Condition=" '$(IS_PREVIEW)' == 'true' ">pre</VersionSuffix>
