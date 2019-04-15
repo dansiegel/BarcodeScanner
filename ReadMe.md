@@ -79,6 +79,13 @@ Or you can limit ZXing on a global level to only search for certain specified Ba
 BarcodeScannerOptions.UpdatePossibleFormats(BarcodeFormat.CODE_128, BarcodeFormat.EAN_13);
 ```
 
+Sometimes you may have a requirement where you need to specify specific barcode formats as part of your call. For this use case the IBarcodeScannerService was updated to now allow you to pass in specific Barcode Formats to use for that exact Scanner call.
+
+```cs
+// this will only scan for QR Codes
+var qrValue = await _scanner.ReadBarcodeAsync(BarcodeFormat.QR_CODE);
+```
+
 ### Customization
 
 Both the `ContentPageBarcodeScannerService` and the `PopupBarcodeScannerService` are designed to allow you to customize the look and feel without having to worry about hooking into the Scan Result event.

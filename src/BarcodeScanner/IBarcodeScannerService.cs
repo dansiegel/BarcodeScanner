@@ -7,6 +7,10 @@ namespace BarcodeScanner
     {
         Task<string> ReadBarcodeAsync();
 
+        Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats);
+
         Task<Result> ReadBarcodeResultAsync();
+
+        Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats);
     }
 }

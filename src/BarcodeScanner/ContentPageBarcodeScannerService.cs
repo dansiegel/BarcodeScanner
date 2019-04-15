@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using ZXing;
 using ZXing.Mobile;
@@ -45,10 +46,14 @@ namespace BarcodeScanner
 
         public async Task<string> ReadBarcodeAsync()
         {
-            await Application.Current.MainPage.Navigation.PushModalAsync(this);
-            await Task.Run(() => { while (!HasResult) { } });
-            Application.Current.MainPage.Navigation.RemovePage(this);
-            return Result?.Text;
+            var result = await ReadBarcodeResultAsync();
+            return result?.Text;
+        }
+
+        public async Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats)
+        {
+            var result = await ReadBarcodeResultAsync(barcodeFormats);
+            return result?.Text;
         }
 
         public async Task<Result> ReadBarcodeResultAsync()
@@ -57,6 +62,15 @@ namespace BarcodeScanner
             await Task.Run(() => { while (!HasResult) { } });
             Application.Current.MainPage.Navigation.RemovePage(this);
             return Result;
+        }
+
+        public async Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats)
+        {
+            var initialFormats = ScannerView.Options.PossibleFormats;
+            ScannerView.Options.PossibleFormats = new List<BarcodeFormat>(barcodeFormats);
+            var result = await ReadBarcodeResultAsync();
+            ScannerView.Options.PossibleFormats = initialFormats;
+            return result;
         }
 
         protected virtual string TopText() => BarcodeScannerOptions.TopText;
