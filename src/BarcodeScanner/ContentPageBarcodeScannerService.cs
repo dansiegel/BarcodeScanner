@@ -6,13 +6,13 @@ using ZXing.Net.Mobile.Forms;
 
 namespace BarcodeScanner
 {
-    public class ContentPageBarcodeScannerService : ContentPage, IBarcodeScannerService
+    public class ContentPageBarcodeScannerService : ContentPage, IBarcodeScannerService, IBarcodeScannerView
     {
-        protected ZXingScannerView ScannerView { get; }
+        public ZXingScannerView ScannerView { get; }
 
-        private bool HasResult { get; set; }
+        public bool HasResult { get; set; }
 
-        private Result Result { get; set; }
+        public Result Result { get; set; }
 
         public ContentPageBarcodeScannerService()
         {
@@ -23,8 +23,6 @@ namespace BarcodeScanner
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 Options = GetScanningOptions(),
             };
-
-            ScannerView.OnScanResult += OnScanResult;
 
             var overlay = GetScannerOverlay();
 
@@ -61,9 +59,9 @@ namespace BarcodeScanner
             return Result;
         }
 
-        protected virtual string TopText() => string.Empty;
+        protected virtual string TopText() => BarcodeScannerOptions.TopText;
 
-        protected virtual string BottomText() => string.Empty;
+        protected virtual string BottomText() => BarcodeScannerOptions.BottomText;
 
         protected virtual View GetScannerOverlay()
         {
@@ -85,34 +83,38 @@ namespace BarcodeScanner
 
         protected virtual MobileBarcodeScanningOptions GetScanningOptions()
         {
-            return new MobileBarcodeScanningOptions()
-            {
-                AutoRotate = false,
-                TryHarder = true,
-                UseNativeScanning = true,
-                UseFrontCameraIfAvailable = false
-            };
+            return BarcodeScannerOptions.DefaultScanningOptions;
         }
 
         protected override void OnAppearing()
         {
-            base.OnAppearing();
-            HasResult = false;
-            Result = null;
-            ScannerView.IsScanning = true;
+            ((IBarcodeScannerView)this).Initialize();
         }
 
         protected override void OnDisappearing()
         {
-            base.OnDisappearing();
-            HasResult = true;
-            ScannerView.IsScanning = false;
+            ((IBarcodeScannerView)this).Destroy();
         }
 
-        private void OnScanResult(Result result)
+        public void OnScanResult(Result result)
         {
             Result = result;
             HasResult = true;
+        }
+
+        void IBarcodeScannerView.Initialize()
+        {
+            HasResult = false;
+            Result = null;
+            ScannerView.IsScanning = true;
+            ScannerView.OnScanResult += OnScanResult;
+        }
+
+        void IBarcodeScannerView.Destroy()
+        {
+            HasResult = true;
+            ScannerView.IsScanning = false;
+            ScannerView.OnScanResult -= OnScanResult;
         }
     }
 }

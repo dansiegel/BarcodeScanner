@@ -51,6 +51,34 @@ public class ViewAViewModel
 }
 ```
 
+#### New in 1.2
+
+Starting with Version 1.2 the Barcode Scanner made a few changes to make it easier to customize without having to implement your own Scanner Page, with the introduction of BarcodeScannerOptions.
+
+```cs
+// Define your own MobileBarcodeScanningOptions for ZXing to use.
+// NOTE: This is the default settings
+BarcodeScannerOptions.DefaultScanningOptions = new MobileBarcodeScanningOptions()
+                                                {
+                                                    AutoRotate = false,
+                                                    TryHarder = true,
+                                                    UseNativeScanning = true,
+                                                    UseFrontCameraIfAvailable = false,
+                                                };
+```
+
+You can also limit ZXing on a global level to only search for a specified Barcode Format
+
+```cs
+BarcodeScannerOptions.UpdatePossibleFormats(BarcodeFormat.QR_CODE);
+```
+
+Or you can limit ZXing on a global level to only search for certain specified Barcode Formats
+
+```cs
+BarcodeScannerOptions.UpdatePossibleFormats(BarcodeFormat.CODE_128, BarcodeFormat.EAN_13);
+```
+
 ### Customization
 
 Both the `ContentPageBarcodeScannerService` and the `PopupBarcodeScannerService` are designed to allow you to customize the look and feel without having to worry about hooking into the Scan Result event.

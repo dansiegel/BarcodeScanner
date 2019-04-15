@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Rg.Plugins.Popup.Contracts;
 using Rg.Plugins.Popup.Pages;
 using Xamarin.Forms;
@@ -8,21 +9,28 @@ using ZXing.Net.Mobile.Forms;
 
 namespace BarcodeScanner
 {
-    public class PopupBarcodeScannerService : PopupPage, IBarcodeScannerService
+    public class PopupBarcodeScannerService : PopupPage, IBarcodeScannerService, IBarcodeScannerView
     {
-        protected ZXingScannerView ScannerView { get; }
+        public ZXingScannerView ScannerView { get; }
+
+        public bool HasResult { get; set; }
+
+        public Result Result { get; set; }
 
         protected IPopupNavigation PopupNavigation { get; }
 
-        private bool HasResult { get; set; }
-
-        private Result Result { get; set; }
+        private ZXingDefaultOverlay DefaultOverlay { get; set; }
 
         public PopupBarcodeScannerService(IPopupNavigation popupNavigation)
         {
             PopupNavigation = popupNavigation;
-
-            BackgroundClicked += (sender, e) => HasResult = true;
+            DefaultOverlay = new ZXingDefaultOverlay
+            {
+                TopText = TopText(),
+                BottomText = BottomText(),
+                ShowFlashButton = ScannerView.HasTorch,
+                AutomationId = "zxingDefaultOverlay",
+            };
 
             Padding = GetDefaultPadding();
 
@@ -33,8 +41,6 @@ namespace BarcodeScanner
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 Options = GetScanningOptions(),
             };
-
-            ScannerView.OnScanResult += OnScanResult;
 
             var overlay = GetScannerOverlay();
 
@@ -55,15 +61,15 @@ namespace BarcodeScanner
             Content = grid;
         }
 
-        protected virtual bool ShouldCloseOnBackgroundTapped() => true;
+        protected virtual bool ShouldCloseOnBackgroundTapped() => BarcodeScannerOptions.ShouldCloseOnBackgroundTapped;
 
-        protected virtual string TopText() => string.Empty;
+        protected virtual string TopText() => BarcodeScannerOptions.TopText;
 
-        protected virtual string BottomText() => string.Empty;
+        protected virtual string BottomText() => BarcodeScannerOptions.BottomText;
 
         protected virtual View GetScannerOverlay()
         {
-            var overlay = new ZXingDefaultOverlay
+            DefaultOverlay = new ZXingDefaultOverlay
             {
                 TopText = TopText(),
                 BottomText = BottomText(),
@@ -71,12 +77,7 @@ namespace BarcodeScanner
                 AutomationId = "zxingDefaultOverlay",
             };
 
-            overlay.FlashButtonClicked += (sender, e) =>
-            {
-                ScannerView.IsTorchOn = !ScannerView.IsTorchOn;
-            };
-
-            return overlay;
+            return DefaultOverlay;
         }
 
         protected virtual Thickness GetDefaultPadding() =>
@@ -84,13 +85,7 @@ namespace BarcodeScanner
 
         protected virtual MobileBarcodeScanningOptions GetScanningOptions()
         {
-            return new MobileBarcodeScanningOptions()
-            {
-                AutoRotate = false,
-                TryHarder = true,
-                UseNativeScanning = true,
-                UseFrontCameraIfAvailable = false,
-            };
+            return BarcodeScannerOptions.DefaultScanningOptions;
         }
 
         public async Task<string> ReadBarcodeAsync()
@@ -111,23 +106,56 @@ namespace BarcodeScanner
 
         protected override void OnAppearing()
         {
-            base.OnAppearing();
-            HasResult = false;
-            Result = null;
-            ScannerView.IsScanning = true;
+            ((IBarcodeScannerView)this).Initialize();
         }
 
         protected override void OnDisappearing()
         {
-            base.OnDisappearing();
-            HasResult = true;
-            ScannerView.IsScanning = false;
+            ((IBarcodeScannerView)this).Destroy();
         }
 
-        private void OnScanResult(Result result)
+        public void OnScanResult(Result result)
         {
             Result = result;
             HasResult = true;
+        }
+
+        void IBarcodeScannerView.Initialize()
+        {
+            HasResult = false;
+            Result = null;
+            ScannerView.IsScanning = true;
+            ScannerView.OnScanResult += OnScanResult;
+
+            if(DefaultOverlay != null)
+            {
+                DefaultOverlay.FlashButtonClicked += OnFlashButtonClicked;
+            }
+        }
+
+        void IBarcodeScannerView.Destroy()
+        {
+            HasResult = true;
+            ScannerView.IsScanning = false;
+            ScannerView.OnScanResult -= OnScanResult;
+
+            if (DefaultOverlay != null)
+            {
+                DefaultOverlay.FlashButtonClicked -= OnFlashButtonClicked;
+            }
+        }
+
+        protected override bool OnBackgroundClicked()
+        {
+            if(ShouldCloseOnBackgroundTapped())
+                HasResult = true;
+
+            return base.OnBackgroundClicked();
+        }
+
+        private void OnFlashButtonClicked(object sender, EventArgs args)
+        {
+            ScannerView.IsTorchOn = !ScannerView.IsTorchOn;
         }
     }
 }
