@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ZXing;
 
@@ -10,6 +11,8 @@ namespace BarcodeScanner
         Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats);
 
         Task<Result> ReadBarcodeResultAsync();
+
+        IObservable<Result> OnBarcodeResult();
 
         Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats);
     }

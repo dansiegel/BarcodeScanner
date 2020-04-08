@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Rg.Plugins.Popup.Contracts;
 using Rg.Plugins.Popup.Pages;
@@ -12,30 +11,21 @@ namespace BarcodeScanner
 {
     public class PopupBarcodeScannerService : PopupPage, IBarcodeScannerService, IBarcodeScannerView
     {
-        public ZXingScannerView ScannerView { get; }
+        private ZXingScannerView _scannerView;
+        ZXingScannerView IBarcodeScannerView.ScannerView => _scannerView;
 
-        public bool HasResult { get; set; }
-
-        public Result Result { get; set; }
+        private BarcodeScannerController _controller { get; }
 
         protected IPopupNavigation PopupNavigation { get; }
 
-        private ZXingDefaultOverlay DefaultOverlay { get; set; }
 
         public PopupBarcodeScannerService(IPopupNavigation popupNavigation)
         {
             PopupNavigation = popupNavigation;
-            DefaultOverlay = new ZXingDefaultOverlay
-            {
-                TopText = TopText(),
-                BottomText = BottomText(),
-                ShowFlashButton = ScannerView.HasTorch,
-                AutomationId = "zxingDefaultOverlay",
-            };
 
             Padding = GetDefaultPadding();
 
-            ScannerView = new ZXingScannerView
+            _scannerView = new ZXingScannerView
             {
                 AutomationId = "zxingScannerView",
                 HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -51,14 +41,14 @@ namespace BarcodeScanner
                 HorizontalOptions = LayoutOptions.FillAndExpand,
             };
 
-            grid.Children.Add(ScannerView);
+            grid.Children.Add(_scannerView);
 
             if(overlay != null)
             {
                 grid.Children.Add(overlay);
             }
 
-            // The root page of your application
+            _controller = new BarcodeScannerController(this);
             Content = grid;
         }
 
@@ -68,17 +58,13 @@ namespace BarcodeScanner
 
         protected virtual string BottomText() => BarcodeScannerOptions.BottomText;
 
+        string IBarcodeScannerView.TopText() => TopText();
+
+        string IBarcodeScannerView.BottomText() => BottomText();
+
         protected virtual View GetScannerOverlay()
         {
-            DefaultOverlay = new ZXingDefaultOverlay
-            {
-                TopText = TopText(),
-                BottomText = BottomText(),
-                ShowFlashButton = ScannerView.HasTorch,
-                AutomationId = "zxingDefaultOverlay",
-            };
-
-            return DefaultOverlay;
+            return _controller.DefaultOverlay;
         }
 
         protected virtual Thickness GetDefaultPadding() =>
@@ -89,87 +75,39 @@ namespace BarcodeScanner
             return BarcodeScannerOptions.DefaultScanningOptions;
         }
 
-        public async Task<string> ReadBarcodeAsync()
-        {
-            var result = await ReadBarcodeResultAsync();
-            return result?.Text;
-        }
+        protected override void OnAppearing() =>
+            _controller.OnAppearing();
 
-        public async Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats)
-        {
-            var result = await ReadBarcodeResultAsync(barcodeFormats);
-            return result?.Text;
-        }
-
-        public async Task<Result> ReadBarcodeResultAsync()
-        {
-            await PopupNavigation.PushAsync(this);
-            await Task.Run(() => { while(!HasResult) { } });
-            await PopupNavigation.RemovePageAsync(this);
-            return Result;
-        }
-
-        public async Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats)
-        {
-            var initialFormats = ScannerView.Options.PossibleFormats;
-            ScannerView.Options.PossibleFormats = new List<BarcodeFormat>(barcodeFormats);
-            var result = await ReadBarcodeResultAsync();
-            ScannerView.Options.PossibleFormats = initialFormats;
-            return result;
-        }
-
-        protected override void OnAppearing()
-        {
-            ((IBarcodeScannerView)this).Initialize();
-        }
-
-        protected override void OnDisappearing()
-        {
-            ((IBarcodeScannerView)this).Destroy();
-        }
-
-        public void OnScanResult(Result result)
-        {
-            Result = result;
-            HasResult = true;
-        }
-
-        void IBarcodeScannerView.Initialize()
-        {
-            HasResult = false;
-            Result = null;
-            ScannerView.IsScanning = true;
-            ScannerView.OnScanResult += OnScanResult;
-
-            if(DefaultOverlay != null)
-            {
-                DefaultOverlay.FlashButtonClicked += OnFlashButtonClicked;
-            }
-        }
-
-        void IBarcodeScannerView.Destroy()
-        {
-            HasResult = true;
-            ScannerView.IsScanning = false;
-            ScannerView.OnScanResult -= OnScanResult;
-
-            if (DefaultOverlay != null)
-            {
-                DefaultOverlay.FlashButtonClicked -= OnFlashButtonClicked;
-            }
-        }
+        protected override void OnDisappearing() =>
+            _controller.OnDisappearing();
 
         protected override bool OnBackgroundClicked()
         {
-            if(ShouldCloseOnBackgroundTapped())
-                HasResult = true;
+            if (ShouldCloseOnBackgroundTapped())
+                _controller.OnScanResult(null);
 
             return base.OnBackgroundClicked();
         }
 
-        private void OnFlashButtonClicked(object sender, EventArgs args)
-        {
-            ScannerView.IsTorchOn = !ScannerView.IsTorchOn;
-        }
+        public void DoPush() =>
+            PopupNavigation.PushAsync(this);
+
+        public void DoPop() =>
+            PopupNavigation.RemovePageAsync(this);
+
+        public Task<string> ReadBarcodeAsync() =>
+            _controller.ReadBarcodeAsync();
+
+        public Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats) =>
+            _controller.ReadBarcodeAsync(barcodeFormats);
+
+        public Task<Result> ReadBarcodeResultAsync() =>
+            _controller.ReadBarcodeResultAsync();
+
+        public IObservable<Result> OnBarcodeResult() =>
+            _controller.OnBarcodeResult();
+
+        public Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats) =>
+            _controller.ReadBarcodeResultAsync(barcodeFormats);
     }
 }

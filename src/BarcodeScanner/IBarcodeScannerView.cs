@@ -7,14 +7,12 @@ namespace BarcodeScanner
     {
         ZXingScannerView ScannerView { get; }
 
-        bool HasResult { get; set; }
+        void DoPush();
 
-        Result Result { get; set; }
+        void DoPop();
 
-        void OnScanResult(Result result);
+        string TopText();
 
-        void Initialize();
-
-        void Destroy();
+        string BottomText();
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using ZXing;
@@ -9,15 +10,14 @@ namespace BarcodeScanner
 {
     public class ContentPageBarcodeScannerService : ContentPage, IBarcodeScannerService, IBarcodeScannerView
     {
-        public ZXingScannerView ScannerView { get; }
+        private ZXingScannerView _scannerView;
+        ZXingScannerView IBarcodeScannerView.ScannerView => _scannerView;
 
-        public bool HasResult { get; set; }
-
-        public Result Result { get; set; }
+        private BarcodeScannerController _controller { get; }
 
         public ContentPageBarcodeScannerService()
         {
-            ScannerView = new ZXingScannerView
+            _scannerView = new ZXingScannerView
             {
                 AutomationId = "zxingScannerView",
                 HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -33,66 +33,29 @@ namespace BarcodeScanner
                 HorizontalOptions = LayoutOptions.FillAndExpand,
             };
 
-            grid.Children.Add(ScannerView);
+            grid.Children.Add(_scannerView);
 
             if(overlay != null)
             {
                 grid.Children.Add(overlay);
             }
 
-            // The root page of your application
+            _controller = new BarcodeScannerController(this);
+
             Content = grid;
-        }
-
-        public async Task<string> ReadBarcodeAsync()
-        {
-            var result = await ReadBarcodeResultAsync();
-            return result?.Text;
-        }
-
-        public async Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats)
-        {
-            var result = await ReadBarcodeResultAsync(barcodeFormats);
-            return result?.Text;
-        }
-
-        public async Task<Result> ReadBarcodeResultAsync()
-        {
-            await Application.Current.MainPage.Navigation.PushModalAsync(this);
-            await Task.Run(() => { while (!HasResult) { } });
-            Application.Current.MainPage.Navigation.RemovePage(this);
-            return Result;
-        }
-
-        public async Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats)
-        {
-            var initialFormats = ScannerView.Options.PossibleFormats;
-            ScannerView.Options.PossibleFormats = new List<BarcodeFormat>(barcodeFormats);
-            var result = await ReadBarcodeResultAsync();
-            ScannerView.Options.PossibleFormats = initialFormats;
-            return result;
         }
 
         protected virtual string TopText() => BarcodeScannerOptions.TopText;
 
         protected virtual string BottomText() => BarcodeScannerOptions.BottomText;
 
+        string IBarcodeScannerView.TopText() => TopText();
+
+        string IBarcodeScannerView.BottomText() => BottomText();
+
         protected virtual View GetScannerOverlay()
         {
-            var overlay = new ZXingDefaultOverlay
-            {
-                TopText = TopText(),
-                BottomText = BottomText(),
-                ShowFlashButton = ScannerView.HasTorch,
-                AutomationId = "zxingDefaultOverlay",
-            };
-
-            overlay.FlashButtonClicked += (sender, e) =>
-            {
-                ScannerView.IsTorchOn = !ScannerView.IsTorchOn;
-            };
-
-            return overlay;
+            return _controller.DefaultOverlay;
         }
 
         protected virtual MobileBarcodeScanningOptions GetScanningOptions()
@@ -100,35 +63,89 @@ namespace BarcodeScanner
             return BarcodeScannerOptions.DefaultScanningOptions;
         }
 
-        protected override void OnAppearing()
+        protected override void OnAppearing() =>
+            _controller.OnAppearing();
+
+        protected override void OnDisappearing() =>
+            _controller.OnDisappearing();
+
+        private ContentPage GetCurrentContentPage()
         {
-            ((IBarcodeScannerView)this).Initialize();
+            var cp = GetCurrentPage();
+            var mp = TryGetModalPage(cp);
+            return mp ?? cp;
         }
 
-        protected override void OnDisappearing()
+        private ContentPage TryGetModalPage(ContentPage cp)
         {
-            ((IBarcodeScannerView)this).Destroy();
+            var mp = cp.Navigation.ModalStack.LastOrDefault();
+            if (mp != null)
+            {
+                return GetCurrentPage(mp);
+            }
+
+            return null;
         }
 
-        public void OnScanResult(Result result)
+        private ContentPage GetCurrentPage(Page page = null)
         {
-            Result = result;
-            HasResult = true;
+            switch (page)
+            {
+                case ContentPage cp:
+                    return cp;
+                case TabbedPage tp:
+                    return GetCurrentPage(tp.CurrentPage);
+                case NavigationPage np:
+                    return GetCurrentPage(np.CurrentPage);
+                case CarouselPage carouselPage:
+                    return GetCurrentPage(carouselPage.CurrentPage);
+                case MasterDetailPage mdp:
+                    mdp.IsPresented = false;
+                    return GetCurrentPage(mdp.Detail);
+                case Shell shell:
+                    return GetCurrentPage((shell.CurrentItem.CurrentItem as IShellSectionController).PresentedPage);
+                default:
+                    // If we get some random Page Type
+                    if (page != null)
+                    {
+                        Xamarin.Forms.Internals.Log.Warning("Warning", $"An Unknown Page type {page.GetType()} was found walk walking the Navigation Stack. This is not supported by the DialogService");
+                        return null;
+                    }
+
+                    var mainPage = Application.Current?.MainPage;
+                    if (mainPage is null)
+                    {
+                        return null;
+                    }
+
+                    return GetCurrentPage(mainPage);
+            }
         }
 
-        void IBarcodeScannerView.Initialize()
+        public void DoPush()
         {
-            HasResult = false;
-            Result = null;
-            ScannerView.IsScanning = true;
-            ScannerView.OnScanResult += OnScanResult;
+            var currentPage = GetCurrentContentPage();
+            currentPage.Navigation.PushModalAsync(this);
         }
 
-        void IBarcodeScannerView.Destroy()
+        public void DoPop()
         {
-            HasResult = true;
-            ScannerView.IsScanning = false;
-            ScannerView.OnScanResult -= OnScanResult;
+            Navigation.PopModalAsync();
         }
+
+        public Task<string> ReadBarcodeAsync() =>
+            _controller.ReadBarcodeAsync();
+
+        public Task<string> ReadBarcodeAsync(params BarcodeFormat[] barcodeFormats) =>
+            _controller.ReadBarcodeAsync(barcodeFormats);
+
+        public Task<Result> ReadBarcodeResultAsync() =>
+            _controller.ReadBarcodeResultAsync();
+
+        public IObservable<Result> OnBarcodeResult() =>
+            _controller.OnBarcodeResult();
+
+        public Task<Result> ReadBarcodeResultAsync(params BarcodeFormat[] barcodeFormats) =>
+            _controller.ReadBarcodeResultAsync(barcodeFormats);
     }
 }
