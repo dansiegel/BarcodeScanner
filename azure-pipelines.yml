@@ -10,17 +10,17 @@ trigger:
 name: $(Build.BuildId)
 
 pool:
-  vmImage: vs2017-win2016
+  vmImage: windows-latest
 
 variables:
   BuildPlatform: 'Any CPU'
   BuildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@0
-  displayName: Use NuGet 4.8.1
+- task: NuGetToolInstaller@1
+  displayName: Use Latest NuGet
   inputs:
-    versionSpec: 4.8.1
+    checkLatest: true
 
 - task: NuGetCommand@2
   displayName: 'NuGet restore'
